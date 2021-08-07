@@ -1,9 +1,12 @@
 #!/bin/bash
+
 OUR_IP=$(hostname -i)
 rm -rf /tmp/.X*
+
 # start VNC server (Uses VNC_PASSWD Docker ENV variable)
 mkdir -p /tmp/.vnc && echo "$VNC_PASSWD" | vncpasswd -f > /tmp/.vnc/passwd
 vncserver :0 -localhost no -nolisten -rfbauth /tmp/.vnc/passwd -xstartup /opt/x11vnc_entrypoint.sh
+
 # start noVNC web server
 /opt/noVNC/utils/launch.sh --listen 5901 &
 
@@ -16,6 +19,6 @@ if [ -z "$1" ]; then
 else
   # unknown option ==> call command
   echo -e "\n\n------------------ EXECUTE COMMAND ------------------"
-  echo "Executing command: '$@'"
+  echo "Executing command: '$*'"
   exec "$@"
 fi

@@ -1,4 +1,7 @@
+#!/bin/bash
+
 /usr/bin/fluxbox &
+
 # fix for clipboard being passed through
 vncconfig -nowin &
 

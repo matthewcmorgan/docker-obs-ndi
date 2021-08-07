@@ -1,41 +1,53 @@
-FROM    ubuntu:18.04
+FROM ubuntu:21.04
 ARG DEBIAN_FRONTEND="noninteractive"
-# for the VNC connection
-EXPOSE 5900
-# for the browser VNC client
-EXPOSE 5901
+
+RUN apt-get update \ 
+	&& apt-get install -y gnupg 
+
+# Add OBS PPA Repo
+RUN echo "deb http://ppa.launchpad.net/obsproject/obs-studio/ubuntu hirsute main" >> /etc/apt/sources.list
+RUN echo "deb-src http://ppa.launchpad.net/obsproject/obs-studio/ubuntu hirsute main" >> /etc/apt/sources.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BC7345F522079769F5BBE987EFC71127F425E228
+
+# Run APT for All the things
+RUN apt-get update \ 
+	&& apt-get install -y avahi-daemon fluxbox git obs-studio tigervnc-standalone-server vlc wget xterm \
+	&& apt-get upgrade -y \
+	&& apt-get clean -y \
+	&& rm -rf /var/lib/apt/lists/* 
+
+RUN mkdir -p /config/obs-studio /root/.config/
+RUN ln -s /config/obs-studio/ /root/.config/obs-studio 
+RUN sed -i 's/geteuid/getppid/' /usr/bin/vlc 
+
+# Setup NoVNC Repos
+RUN git clone --branch v1.2.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
+RUN git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify
+RUN ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
+
+# Grab and install NDI Binaries
+RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb
+RUN wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb 
+RUN dpkg -i /tmp/*.deb \ 
+	&& rm -rf /tmp/*.deb 
+
+# Add Local Run Scripts
+RUN mkdir -p /opt/startup_scripts
+
+COPY startup.sh /opt/startup_scripts/
+COPY container_startup.sh /opt/
+COPY x11vnc_entrypoint.sh /opt/
+
+RUN chmod +x /opt/*.sh 
+RUN chmod +x /opt/startup_scripts/*.sh
+
+# Add menu entries to the container
+RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"OBS Screencast\" command=\"obs\"" >> /usr/share/menu/custom-docker
+RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"Xterm\" command=\"xterm -ls -bg black -fg white\"" >> /usr/share/menu/custom-docker && update-menus
+
 # Use environment variable to allow custom VNC passwords
 ENV VNC_PASSWD=123456
-# Make sure the dependencies are met
-RUN apt-get update \
-	&& apt install -y tigervnc-standalone-server fluxbox xterm git net-tools python python-numpy scrot wget software-properties-common vlc module-init-tools avahi-daemon \
-	&& sed -i 's/geteuid/getppid/' /usr/bin/vlc \
-	&& add-apt-repository ppa:obsproject/obs-studio \
-	&& git clone --branch v1.0.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC \
-	&& git clone --branch v0.8.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify \
-	&& ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html \
-# Copy various files to their respective places
-	&& wget -q -O /opt/container_startup.sh https://raw.githubusercontent.com/Daedilus/docker-obs-ndi/master/container_startup.sh \
-	&& wget -q -O /opt/x11vnc_entrypoint.sh https://raw.githubusercontent.com/Daedilus/docker-obs-ndi/master/x11vnc_entrypoint.sh \
-	&& mkdir -p /opt/startup_scripts \
-	&& wget -q -O /opt/startup_scripts/startup.sh https://raw.githubusercontent.com/Daedilus/docker-obs-ndi/master/startup.sh \
-	&& wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb \
-	&& wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb 
-# Update apt for the new obs repository
-RUN apt-get update \
-	&& mkdir -p /config/obs-studio /root/.config/ \
-	&& ln -s /config/obs-studio/ /root/.config/obs-studio \
-	&& apt install -y obs-studio \
-	&& apt-get clean -y \
-# Download and install the plugins for NDI
-	&& dpkg -i /tmp/*.deb \
-	&& rm -rf /tmp/*.deb \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& chmod +x /opt/*.sh \
-	&& chmod +x /opt/startup_scripts/*.sh 
-	 
-# Add menu entries to the container
-RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"OBS Screencast\" command=\"obs\"" >> /usr/share/menu/custom-docker \
-	&& echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"Xterm\" command=\"xterm -ls -bg black -fg white\"" >> /usr/share/menu/custom-docker && update-menus
+
 VOLUME ["/config"]
+EXPOSE 5900 5901
 ENTRYPOINT ["/opt/container_startup.sh"]
