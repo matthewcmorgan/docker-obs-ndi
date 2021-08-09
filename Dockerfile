@@ -16,10 +16,6 @@ RUN apt-get update \
 	&& apt-get clean -y \
 	&& rm -rf /var/lib/apt/lists/* 
 
-RUN mkdir -p /config/obs-studio /root/.config/
-RUN ln -s /config/obs-studio/ /root/.config/obs-studio 
-RUN sed -i 's/geteuid/getppid/' /usr/bin/vlc 
-
 # Setup NoVNC Repos
 RUN git clone --branch v1.2.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
 RUN git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify
@@ -31,15 +27,19 @@ RUN wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi
 RUN dpkg -i /tmp/*.deb \ 
 	&& rm -rf /tmp/*.deb 
 
+RUN mkdir -p /config/obs-studio /root/.config/
+RUN ln -s /config/obs-studio/ /root/.config/obs-studio 
+RUN sed -i 's/geteuid/getppid/' /usr/bin/vlc 
+
 # Add Local Run Scripts
 RUN mkdir -p /opt/startup_scripts
 
-COPY startup.sh /opt/startup_scripts/
-COPY container_startup.sh /opt/
-COPY x11vnc_entrypoint.sh /opt/
+ADD startup.sh /opt/startup_scripts/
+ADD container_startup.sh /opt/
+ADD x11vnc_entrypoint.sh /opt/
 
-RUN chmod +x /opt/*.sh 
-RUN chmod +x /opt/startup_scripts/*.sh
+RUN chmod a+x /opt/*.sh 
+RUN chmod a+x /opt/startup_scripts/*.sh
 
 # Add menu entries to the container
 RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"OBS Screencast\" command=\"obs\"" >> /usr/share/menu/custom-docker
@@ -49,5 +49,5 @@ RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"Xterm\" 
 ENV VNC_PASSWD=123456
 
 VOLUME ["/config"]
-EXPOSE 5900 5901
+EXPOSE 5900 5901 6080
 ENTRYPOINT ["/opt/container_startup.sh"]
