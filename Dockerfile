@@ -11,7 +11,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BC7345F522079769F5B
 
 # Run APT for All the things
 RUN apt-get update \ 
-	&& apt-get install -y avahi-daemon fluxbox git obs-studio python3-numpy tigervnc-standalone-server vlc wget xterm \
+	&& apt-get install -y avahi-daemon fluxbox git net-tools obs-studio python3-numpy tigervnc-standalone-server vlc wget xterm \
 	&& apt-get upgrade -y \
 	&& apt-get clean -y \
 	&& rm -rf /var/lib/apt/lists/* 
