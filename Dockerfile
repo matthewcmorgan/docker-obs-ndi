@@ -17,14 +17,14 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* 
 
 # Setup NoVNC Repos
-RUN git clone --branch v1.2.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
-RUN git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify
-RUN ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html
+RUN git clone --branch v1.2.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC \
+	&& git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify \
+	&& ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html
 
 # Grab and install NDI Binaries
-RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb
-RUN wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb 
-RUN dpkg -i /tmp/*.deb \ 
+RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb \
+	&& wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb \
+	&& dpkg -i /tmp/*.deb \ 
 	&& rm -rf /tmp/*.deb 
 
 RUN mkdir -p /config/obs-studio /root/.config/

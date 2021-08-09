@@ -1,6 +1,7 @@
 #!/bin/bash
 
 OUR_IP=$(hostname -i)
+openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem
 rm -rf /tmp/.X*
 
 # start VNC server (Uses VNC_PASSWD Docker ENV variable)
