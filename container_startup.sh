@@ -2,13 +2,12 @@
 
 OUR_IP=$(hostname -i)
 rm -rf /tmp/.X*
-openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem
 
 # start VNC server (Uses VNC_PASSWD Docker ENV variable)
-mkdir -p /tmp/.vnc
+mkdir -p /tmp/.vnc && echo "$VNC_PASSWD" | vncpasswd -f > /tmp/.vnc/passwd
+vncserver :0 -localhost no -nolisten -rfbauth /tmp/.vnc/passwd -xstartup /opt/x11vnc_entrypoint.sh
 
 # start noVNC web server
-vncserver -xstartup /opt/x11vnc_entrypoint.sh
 /opt/noVNC/utils/launch.sh --listen 5901 &
 
 echo -e "\n\n------------------ VNC environment started ------------------"
