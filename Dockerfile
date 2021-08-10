@@ -2,7 +2,7 @@ FROM ubuntu:21.04
 ARG DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update \ 
-	&& apt-get install -y gnupg 
+	&& apt-get install -y avahi-daemon fluxbox git gnupg libusb-dev net-tools python3-numpy p7zip-full tigervnc-standalone-server vlc wget xterm
 
 # Add OBS PPA Repo
 RUN echo "deb http://ppa.launchpad.net/obsproject/obs-studio/ubuntu hirsute main" >> /etc/apt/sources.list
@@ -11,7 +11,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BC7345F522079769F5B
 
 # Run APT for All the things
 RUN apt-get update \ 
-	&& apt-get install -y avahi-daemon fluxbox git libusb-dev net-tools obs-studio python3-numpy p7zip-full tigervnc-standalone-server vlc wget xterm \
+	&& apt-get install -y obs-studio \
 	&& apt-get upgrade -y \
 	&& apt-get clean -y \
 	&& rm -rf /var/lib/apt/lists/* 
@@ -21,11 +21,11 @@ RUN git clone --branch v1.1.0 --single-branch https://github.com/novnc/noVNC.git
 	&& git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify \
 	&& ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html
 
-# Grab and install NDI Binaries
-RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb \
-	&& wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb \
-	&& dpkg -i /tmp/*.deb \ 
-	&& rm -rf /tmp/*.deb 
+# # Grab and install NDI Binaries
+# RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb \
+# 	&& wget -q -O /tmp/obs-ndi_4.9.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/obs-ndi_4.9.1-1_amd64.deb \
+# 	&& dpkg -i /tmp/*.deb \ 
+# 	&& rm -rf /tmp/*.deb 
 
 RUN mkdir -p /config/obs-studio /root/.config/
 RUN ln -s /config/obs-studio/ /root/.config/obs-studio 
