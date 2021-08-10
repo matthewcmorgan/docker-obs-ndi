@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 OUR_IP=$(hostname -i)
 rm -rf /tmp/.X*
