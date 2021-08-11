@@ -43,7 +43,7 @@ ADD container_startup.sh /opt/
 ADD x11vnc_entrypoint.sh /opt/
 ADD firmware.tgz /tmp/
 
-RUN tar -vzxf firmware.tgz -C /usr/local/lib/firmware/
+RUN tar -vzxf /tmp/firmware.tgz -C /usr/local/lib/firmware/
 RUN rm -rf /tmp/*.tgz
 RUN chmod a+x /opt/*.sh 
 RUN chmod a+x /opt/startup_scripts/*.sh
