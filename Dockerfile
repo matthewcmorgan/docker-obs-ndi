@@ -53,5 +53,5 @@ RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"Xterm\" 
 ENV VNC_PASSWD=123456
 
 VOLUME ["/config"]
-EXPOSE 5900 5901 6080
+EXPOSE 5900 5901
 ENTRYPOINT ["/opt/container_startup.sh"]
