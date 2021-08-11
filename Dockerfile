@@ -36,7 +36,7 @@ RUN mkdir -p /opt/startup_scripts
 RUN mkdir -p /usr/local/lib/firmware
 
 # Generate self signed cert
-RUN openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem
+RUN openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem -batch
 
 ADD startup.sh /opt/startup_scripts/
 ADD container_startup.sh /opt/
