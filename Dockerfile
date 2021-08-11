@@ -19,7 +19,7 @@ RUN apt-get update \
 # Setup NoVNC Repos
 RUN git clone --branch v1.1.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC \
 	&& git clone --branch v0.10.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify \
-	&& ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html
+	&& ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
 
 # # Grab and install NDI Binaries
 # RUN wget -q -O /tmp/libndi4_4.5.1-1_amd64.deb https://github.com/Palakis/obs-ndi/releases/download/4.9.1/libndi4_4.5.1-1_amd64.deb \
