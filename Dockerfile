@@ -41,10 +41,9 @@ RUN openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem -batc
 ADD startup.sh /opt/startup_scripts/
 ADD container_startup.sh /opt/
 ADD x11vnc_entrypoint.sh /opt/
-ADD firmware.tgz /tmp/
+ADD firmware.tgz /usr/local/lib/firmware 
 
-RUN tar -vzxf /tmp/firmware.tgz -C /usr/local/lib/firmware/
-RUN rm -rf /tmp/*.tgz
+RUN tar -xf /usr/local/lib/firmware/firmware.tgz && rm -rf /usr/local/lib/firmware/firmware.tgz
 RUN chmod a+x /opt/*.sh 
 RUN chmod a+x /opt/startup_scripts/*.sh
 
