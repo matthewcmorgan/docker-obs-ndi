@@ -27,8 +27,6 @@ RUN git clone --branch v1.1.0 --single-branch https://github.com/novnc/noVNC.git
 # 	&& dpkg -i /tmp/*.deb \ 
 # 	&& rm -rf /tmp/*.deb 
 
-RUN mkdir -p /config/obs-studio /root/.config/
-RUN ln -s /config/obs-studio/ /root/.config/obs-studio 
 RUN sed -i 's/geteuid/getppid/' /usr/bin/vlc 
 
 # Add Local Run Scripts
@@ -45,6 +43,7 @@ ADD firmware.tgz /usr/local/lib/firmware
 
 RUN chmod a+x /opt/*.sh 
 RUN chmod a+x /opt/startup_scripts/*.sh
+RUN touch /root/.Xauthority
 
 # Add menu entries to the container
 RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"OBS Screencast\" command=\"obs\"" >> /usr/share/menu/custom-docker
